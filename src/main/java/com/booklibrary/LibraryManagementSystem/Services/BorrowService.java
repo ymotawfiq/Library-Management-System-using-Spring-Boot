@@ -71,7 +71,7 @@ public class BorrowService {
         if(isBorrowed.isPresent())
         {
             _borrowRepository.delete(isBorrowed.get());
-            return new ResponseModel<>(204, true, "Un Borrowed successfully, This book will be available for you from ");
+            return new ResponseModel<>(204, true, "Un Borrowed successfully");
         }
         return new ResponseModel<>(403, false, "You are not borrowing this book");
     }

@@ -92,16 +92,19 @@ public class BorrowController {
     public ResponseEntity<ResponseModel<?>> GetBookPatrons(@PathVariable String bookId){
         try{
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String token = _servletRequest.getHeader("Authorization");
-            if(token==null || _logOutTokensService.IsTokenKilled(token).isSuccess()){
-                return ResponseEntity.ok(new ResponseModel<>(401, false, "unauthorized"));
+            if(authentication!=null){
+                String token = _servletRequest.getHeader("Authorization");
+                if(_logOutTokensService.IsTokenKilled(token).isSuccess()){
+                    return ResponseEntity.ok(new ResponseModel<>(401, false, "unauthorized"));
+                }
+                Optional<Patron> patron = _patronRepository.findByUserName(authentication.getName());
+                if(!patron.isPresent()){
+                    return ResponseEntity.ok(new ResponseModel<>(404, false, "User not found"));
+                }
+                ResponseModel<?> response = _borrowService.GetBookPatrons(patron.get(), bookId);
+                return ResponseEntity.ok(response);
             }
-            Optional<Patron> patron = _patronRepository.findByUserName(authentication.getName());
-            if(!patron.isPresent()){
-                return ResponseEntity.ok(new ResponseModel<>(404, false, "User not found"));
-            }
-            ResponseModel<?> response = _borrowService.GetBookPatrons(patron.get(), bookId);
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(new ResponseModel<>(401, false, "unauthorized"));
         }
         catch(Exception e){
             return ResponseEntity.internalServerError()

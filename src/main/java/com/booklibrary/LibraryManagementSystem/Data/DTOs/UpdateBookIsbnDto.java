@@ -1,5 +1,7 @@
 package com.booklibrary.LibraryManagementSystem.Data.DTOs;
 
+import org.hibernate.validator.constraints.Length;
+
 import jakarta.validation.constraints.NotBlank;
 
 public class UpdateBookIsbnDto {
@@ -7,7 +9,7 @@ public class UpdateBookIsbnDto {
     @NotBlank
     private String id;
 
-    @NotBlank
+    @NotBlank @Length(min = 10, max = 13)
     private String isbn;
 
     public UpdateBookIsbnDto() {

@@ -24,8 +24,8 @@ public interface PatronRolesRepository extends CrudRepository<PatronRoles, Patro
          nativeQuery = true)
     List<String> findUserRolesName(String userId);
 
-    @Query(value = "SELECT * FROM patron_roles WHERE patron_id=?1 AND role_id=?2 LIMIT 1",
+    @Query(value = "SELECT * FROM patron_roles WHERE patron_id=?1 AND role_id=(SELECT id from roles WHERE normalized_role_name=?2) LIMIT 1",
           nativeQuery = true)
-     Optional<PatronRoles> isPatronInRole(String patronId, String roleId);
+     Optional<PatronRoles> isPatronInRole(String patronId, String roleName);
 
 }

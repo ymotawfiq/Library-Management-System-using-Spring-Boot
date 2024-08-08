@@ -42,7 +42,7 @@ public class EmailServiceImpl {
     }
 
     private String generateConfirmationLink(String token, String userName){
-        return "<a href=http://localhost:8080/auth/confirm-email?token="+token+"&userName="+userName+">Confirm Email</a>";
+        return "<a href=http://localhost:8080/api/patron/confirm-email?token="+token+"&userName="+userName+">Confirm Email</a>";
     }
 
 

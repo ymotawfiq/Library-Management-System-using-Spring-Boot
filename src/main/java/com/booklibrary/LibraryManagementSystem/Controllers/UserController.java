@@ -99,8 +99,12 @@ public class UserController {
 	
 	@PostMapping("/login")
 	@Async
-	public ResponseEntity<ResponseModel<?>> Login(@RequestBody LoginDto loginDto){
+	public ResponseEntity<ResponseModel<?>> Login(@RequestBody LoginDto loginDto) throws Exception{
 		try {
+			String token = _servletRequest.getHeader("Authorization");
+			if(token != null){
+				return ResponseEntity.ok(new ResponseModel<>(401, false, "Un Authorized"));
+			}
 			ResponseModel<?> model = _authenticationService.Login(loginDto);
 			return ResponseEntity.ok(model);
 		}
@@ -116,8 +120,7 @@ public class UserController {
 		try {
 			String token = _servletRequest.getHeader("Authorization");
 			if(token != null){
-				if(!_logOutTokensService.IsTokenKilled(token).isSuccess())
-					return ResponseEntity.ok(new ResponseModel<>(401, false, "Un Authorized"));
+				return ResponseEntity.ok(new ResponseModel<>(401, false, "Un Authorized"));
 			}
 			Optional<Patron> user = _userRepository.findByEmail(email);
 			if(!user.isPresent()){
@@ -231,13 +234,15 @@ public class UserController {
 	}
 
 	@Async
-	@PostMapping("/2FAlogin")
+	@PostMapping("/2FA-login")
 	public ResponseEntity<ResponseModel<?>> TwoFactorLogin(@RequestBody TwoFactorLoginDto  twoFactorLogin) {
 		try{
+
 			String token = _servletRequest.getHeader("Authorization");
-			if(token != null || !_logOutTokensService.IsTokenKilled(token).isSuccess()){
+			if(token != null){
 				return ResponseEntity.ok(new ResponseModel<>(401, false, "Un Authorized"));
 			}
+			
 			ResponseModel<?> response = _authenticationService.LoginWithTwoFactor(twoFactorLogin);
 			return ResponseEntity.ok(response);
 		}

@@ -21,11 +21,10 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Table;
-import lombok.Builder;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 
-@Builder
+
 @Entity
 @Table(name = "patrons")
 public class Patron implements UserDetails {

@@ -15,6 +15,7 @@ import com.booklibrary.LibraryManagementSystem.Data.DTOs.ForgetPasswordDto;
 import com.booklibrary.LibraryManagementSystem.Data.DTOs.LoginDto;
 import com.booklibrary.LibraryManagementSystem.Data.DTOs.RegisterDto;
 import com.booklibrary.LibraryManagementSystem.Data.DTOs.ResetPasswordDto;
+import com.booklibrary.LibraryManagementSystem.Data.DTOs.TokenResponseDto;
 import com.booklibrary.LibraryManagementSystem.Data.DTOs.TwoFactorLoginDto;
 import com.booklibrary.LibraryManagementSystem.Data.DTOs.UpdateFullNameDto;
 import com.booklibrary.LibraryManagementSystem.Data.DTOs.UpdateUserNameDto;
@@ -114,10 +115,14 @@ public class AuthenticationService {
 		}
 		if(!user.isTwoFactorEnabled()){
 			String token = _jwtService.generateToken(user);
-			return new ResponseModel<>(200, true, "Token generated successfully", token);
+			return new ResponseModel<>(200, true, "Token generated successfully", 
+				new TokenResponseDto(token, "Barer token"));
 		}
-		Optional<TwoFactorCode> code = _twoFactorCodeRepository.findByUserId(user.getId());
-		if(code.isPresent()){
+		Optional<TwoFactorCode> code = _twoFactorCodeRepository.findCodeByUserId(user.getId());
+		if(code.isPresent() && LocalDateTime.now().compareTo(code.get().getExpiresAt())>0){
+			_twoFactorCodeRepository.deleteOldCode(code.get().getUser().getId());
+		}
+		else if(code.isPresent() && LocalDateTime.now().compareTo(code.get().getExpiresAt())<0){
 			return new ResponseModel<>(200, true, "Check your inbox");
 		}
 		TwoFactorCode newCode = new TwoFactorCode(user);
@@ -128,12 +133,13 @@ public class AuthenticationService {
 
 	@Async
 	@Transactional
-	public ResponseModel<?> LoginWithTwoFactor(TwoFactorLoginDto twoFactorLogin) throws Exception{
-		Patron user = findUser(twoFactorLogin.getEmail());
-		if(user==null){
+	public ResponseModel<?> LoginWithTwoFactor(TwoFactorLoginDto twoFactorLogin){
+		Optional<Patron> user = _userRepository.findByEmail(twoFactorLogin.getEmail());
+		System.out.println(user.get().getId());
+		if(!user.isPresent() || user == null || user.get().getId() == null){
 			return new ResponseModel<>(500, false, "Invalid email or code");
 		}
-		Optional<TwoFactorCode> twoFactorCode = _twoFactorCodeRepository.findByUserId(user.getId());
+		Optional<TwoFactorCode> twoFactorCode = _twoFactorCodeRepository.findCodeByUserId(user.get().getId());
 		if(!twoFactorCode.isPresent()){
 			return new ResponseModel<>(500, false, "Invalid email or code");
 		}
@@ -143,9 +149,10 @@ public class AuthenticationService {
 		else if(LocalDateTime.now().compareTo(twoFactorCode.get().getExpiresAt())>0){
 			return new ResponseModel<>(500, false, "Invalid email or code");
 		}
-		String token = _jwtService.generateToken(user);
+		String token = _jwtService.generateToken(user.get());
 		_twoFactorCodeRepository.delete(twoFactorCode.get());
-		return new ResponseModel<>(200, true, "Token generated successfully", token);
+		return new ResponseModel<>(200, true, "Token generated successfully", 
+			new TokenResponseDto(token, "Barer token"));
 	}
 	
 	@Async
