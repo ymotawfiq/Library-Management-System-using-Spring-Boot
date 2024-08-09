@@ -14,6 +14,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.booklibrary.LibraryManagementSystem.Repository.PatronRepository;
 
+
+
 @Configuration
 @EnableWebSecurity
 public class ApplicationConfiguration {
@@ -46,7 +48,7 @@ public class ApplicationConfiguration {
 		dao.setPasswordEncoder(passwordEncoder());
 		return dao;
 	}
-	
+
 
 	
 }

@@ -38,7 +38,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RequestMapping("/api/patron")
 @RestController
-public class UserController {
+public class PatronController {
 
 	private final AuthenticationService _authenticationService;
 	private final EmailServiceImpl _emailServiceImpl;
@@ -47,7 +47,7 @@ public class UserController {
 	private final HttpServletRequest _servletRequest;
 	private final LogOutTokensService _logOutTokensService;
 	private final IMappingToDtoService _mappingToDtoService;
-	public UserController(
+	public PatronController(
 		AuthenticationService authenticationService, 
 		EmailServiceImpl emailServiceImpl,
 		PatronRepository userRepository, 

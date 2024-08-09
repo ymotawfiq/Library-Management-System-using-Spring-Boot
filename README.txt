@@ -37,8 +37,13 @@ to add, update and delete books.
 Then i created borrowing service which allows user to borrow book to 
 specefic date.
 
+-------------------------
+Swagger API Documentation|
+-------------------------
+Just run application like mentioned and go to (http://localhost:8080/swagger-ui/index.html#/)
+
 -----------------
-Api Documentation |
+API Documentation |
 -----------------
 Link: http://localhost:8080/api/patron/insert-roles
 
